@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text File Processor</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow-x: hidden; /* Ensure no horizontal scrolling */
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+            word-wrap: break-word; /* Ensure words are broken to fit within the container */
+            word-break: break-all;  /* Force breaks in words if necessary */
+            overflow-wrap: break-word; /* Ensure long words break inside the container */
+            max-width: 100%; /* Ensure the container doesn't go beyond the screen width */
+            overflow: hidden; /* Ensure no content overflows */
+        }
+
+        h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        #fileInput {
+            margin-bottom: 15px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            text-decoration: none;
+            color: #fff;
+            background-color: #007BFF;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        a:hover {
+            background-color: #0056b3;
+        }
+
+        #downloadLink {
+            display: none;
+        }
+
+        .file-label {
+            background-color: #f4f4f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #333;
+            transition: background-color 0.3s ease;
+            font-size: 16px;
+        }
+
+        .file-label:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Text File Processor</h2>
+
+        <!-- Custom file input -->
+        <label for="fileInput" class="file-label">Upload a Text File</label>
+        <input type="file" id="fileInput" accept=".txt" style="display:none;">
+        <br><br>
+
+        <!-- Button to trigger processing -->
+        <button onclick="processFile()">Process File</button>
+
+        <!-- Link to download the processed file -->
+        <br><br>
+        <a id="downloadLink">Download Processed File</a>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileLabel = document.querySelector('.file-label');
+
+        // Update file label text when a file is selected
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files.length > 0) {
+                fileLabel.textContent = fileInput.files[0].name;
+            } else {
+                fileLabel.textContent = 'Upload a Text File';
+            }
+        });
+
+        function processFile() {
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+                    const fileContent = event.target.result;
+
+                    // Process the text: remove extra spaces and replace # with a new line
+                    const processedContent = fileContent
+                        .replace(/\n+/g, ' ')  // Remove extra newlines
+                        .replace(/\s+/g, ' ')  // Remove extra spaces
+                        .replace(/#/g, '\n')   // Break paragraphs on #
+                        .trim();
+
+                    // Create a Blob object with the processed content
+                    const blob = new Blob([processedContent], { type: 'text/plain' });
+
+                    // Create a download link and trigger download
+                    const downloadLink = document.getElementById('downloadLink');
+                    downloadLink.href = URL.createObjectURL(blob);
+                    downloadLink.download = 'processed_file.txt';
+                    downloadLink.style.display = 'inline-block';
+                    downloadLink.textContent = 'Download Processed File';
+                };
+
+                // Read the file as text
+                reader.readAsText(file);
+            } else {
+                alert('Please select a file to process.');
+            }
+        }
+    </script>
+
+</body>
+</html>
